@@ -13,14 +13,10 @@
   <xacro:property name="wheel_mass" value="0.5"/>
   <xacro:property name="wheel_x" value="-0.1"/>
   <xacro:property name="wheel_gap" value="0.005"/>
+  <xacro:property name="wheel_y" value="${chassis_y/2 + wheel_w/2 + wheel_gap}"/>
 
   <xacro:property name="caster_r" value="0.03"/>
   <xacro:property name="caster_x" value="0.15"/>
-
-  <xacro:property name="lidar_r" value="0.04"/>
-  <xacro:property name="lidar_h" value="0.05"/>
-  <xacro:property name="lidar_mass" value="0.1"/>
-  <xacro:property name="lidar_x" value="0.1"/>
 
   <!-- ===== RENKLER (RViz icin) ===== -->
   <material name="mavi"><color rgba="0.2 0.2 0.8 1"/></material>
@@ -80,7 +76,7 @@
     <joint name="${prefix}_wheel_joint" type="continuous">
       <parent link="base_link"/>
       <child link="${prefix}_wheel"/>
-      <origin xyz="${wheel_x} ${y_sign*(chassis_y/2 + wheel_w/2 + wheel_gap)} ${wheel_r - chassis_height}"/>
+      <origin xyz="${wheel_x} ${y_sign*wheel_y} ${wheel_r - chassis_height}"/>
       <axis xyz="0 1 0"/>
     </joint>
   </xacro:macro>
@@ -88,27 +84,9 @@
   <xacro:wheel prefix="left"  y_sign="1"/>
   <xacro:wheel prefix="right" y_sign="-1"/>
 
-  <!-- ===== LIDAR ===== -->
-  <link name="lidar_link">
-    <visual>
-      <geometry><cylinder radius="${lidar_r}" length="${lidar_h}"/></geometry>
-      <material name="yesil"/>
-    </visual>
-    <collision>
-      <geometry><cylinder radius="${lidar_r}" length="${lidar_h}"/></geometry>
-    </collision>
-    <inertial>
-      <mass value="${lidar_mass}"/>
-      <inertia ixx="${lidar_mass*(3*lidar_r**2 + lidar_h**2)/12}" ixy="0" ixz="0"
-               iyy="${lidar_mass*(3*lidar_r**2 + lidar_h**2)/12}" iyz="0"
-               izz="${lidar_mass*lidar_r**2/2}"/>
-    </inertial>
-  </link>
-
-  <joint name="lidar_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="lidar_link"/>
-    <origin xyz="${lidar_x} 0 ${chassis_z/2 + lidar_h/2}"/>
-  </joint>
+  <!-- ===== EK DOSYALAR ===== -->
+  <xacro:include filename="gazebo.xacro"/>   <!-- surus plugini, joint state, surtunme -->
+  <xacro:include filename="lidar.xacro"/>    <!-- LiDAR: link + joint + sensor -->
+  <!-- arkadasin kamerayi buraya ekleyecek: <xacro:include filename="camera.xacro"/> -->
 
 </robot>
